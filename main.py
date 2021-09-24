@@ -301,8 +301,8 @@ class UserAuthApp(MDApp):
         return main_widget
 
     def user_login(self, *args):
-        email = self.root.ids.email.text
-        password = self.root.ids.password.text
+        email = self.root.ids['email'].text
+        password = self.root.ids['password'].text
 
         '''if email == '':
             content = MDLabel(font_style='Body1',
@@ -329,10 +329,10 @@ class UserAuthApp(MDApp):
                              req_headers=headers)
 
     def user_register(self, *args):
-        first_name = self.root.ids.first_name.text
-        last_name = self.root.ids.last_name.text
-        email = self.root.ids.email_signup.text
-        password = self.root.ids.password_signup.text
+        first_name = self.root.ids['first_name'].text
+        last_name = self.root.ids['last_name'].text
+        email = self.root.ids['email_signup'].text
+        password = self.root.ids['password_signup'].text
 
         params = json.dumps({'email': email, 'password': password, 'first_name': first_name, 'last_name': last_name})
         headers = {'Content-type': 'application/json',
