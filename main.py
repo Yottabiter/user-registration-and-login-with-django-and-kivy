@@ -1,267 +1,248 @@
+from kivy import Config
+Config.set('graphics', 'multisamples', '0')
+import os
+os.environ['KIVY_GL_BACKEND'] = 'glew'
 # -*- coding: utf-8 -*-
-from kivy.app import App
+from kivymd.app import MDApp
 from kivy.lang import Builder
 from kivy.metrics import dp
 from kivy.properties import ObjectProperty
 from kivy.uix.image import Image
 
-from kivymd.bottomsheet import MDListBottomSheet, MDGridBottomSheet
-from kivymd.button import MDIconButton
-from kivymd.date_picker import MDDatePicker
-from kivymd.dialog import MDDialog
-from kivymd.label import MDLabel
-from kivymd.list import ILeftBody, ILeftBodyTouch, IRightBodyTouch, BaseListItem
+from kivymd.uix.bottomsheet import MDListBottomSheet, MDGridBottomSheet
+from kivymd.uix.button import MDIconButton
+from kivymd.uix.picker import MDDatePicker
+from kivymd.uix.dialog import MDDialog
+from kivymd.uix.label import MDLabel
+from kivymd.uix.list import ILeftBody, ILeftBodyTouch, IRightBodyTouch, BaseListItem
 from kivymd.material_resources import DEVICE_TYPE
-from kivymd.navigationdrawer import MDNavigationDrawer, NavigationDrawerHeaderBase
-from kivymd.selectioncontrols import MDCheckbox
-from kivymd.snackbar import Snackbar
+from kivymd.uix.navigationdrawer import MDNavigationDrawer
+from kivymd.uix.selectioncontrol import MDCheckbox
+from kivymd.uix.snackbar import Snackbar
 from kivymd.theming import ThemeManager
-from kivymd.time_picker import MDTimePicker
+from kivymd.uix.picker import MDTimePicker
 from kivy.network.urlrequest import UrlRequest
 import urllib
 import json
 import os
 
 main_widget_kv = '''
-#:import Toolbar kivymd.toolbar.Toolbar
-#:import ThemeManager kivymd.theming.ThemeManager
-#:import MDNavigationDrawer kivymd.navigationdrawer.MDNavigationDrawer
-#:import NavigationLayout kivymd.navigationdrawer.NavigationLayout
-#:import NavigationDrawerDivider kivymd.navigationdrawer.NavigationDrawerDivider
-#:import NavigationDrawerToolbar kivymd.navigationdrawer.NavigationDrawerToolbar
-#:import NavigationDrawerSubheader kivymd.navigationdrawer.NavigationDrawerSubheader
-#:import MDCheckbox kivymd.selectioncontrols.MDCheckbox
-#:import MDSwitch kivymd.selectioncontrols.MDSwitch
-#:import MDList kivymd.list.MDList
-#:import OneLineListItem kivymd.list.OneLineListItem
-#:import TwoLineListItem kivymd.list.TwoLineListItem
-#:import ThreeLineListItem kivymd.list.ThreeLineListItem
-#:import OneLineAvatarListItem kivymd.list.OneLineAvatarListItem
-#:import OneLineIconListItem kivymd.list.OneLineIconListItem
-#:import OneLineAvatarIconListItem kivymd.list.OneLineAvatarIconListItem
-#:import MDTextField kivymd.textfields.MDTextField
-#:import MDSpinner kivymd.spinner.MDSpinner
-#:import MDCard kivymd.card.MDCard
-#:import MDSeparator kivymd.card.MDSeparator
-#:import MDDropdownMenu kivymd.menu.MDDropdownMenu
+#:import Toolbar kivymd.uix.toolbar
+#:import ThemeManager kivymd.theming
+#:import MDNavigationDrawer kivymd.uix.navigationdrawer
+#:import MDNavigationLayout kivymd.uix.navigationdrawer
+#:import NavigationDrawerDivider kivymd.uix.navigationdrawer
+#:import MDToolbar kivymd.uix.navigationdrawer
+#:import NavigationDrawerSubheader kivymd.uix.navigationdrawer
+#:import MDCheckbox kivymd.uix.selectioncontrol
+#:import MDSwitch kivymd.uix.selectioncontrol
+#:import MDList kivymd.uix.list.MDList
+#:import OneLineListItem kivymd.uix.list
+#:import TwoLineListItem kivymd.uix.list
+#:import ThreeLineListItem kivymd.uix.list
+#:import OneLineAvatarListItem kivymd.uix.list
+#:import OneLineIconListItem kivymd.uix.list
+#:import OneLineAvatarIconListItem kivymd.uix.list
+#:import MDTextField kivymd.uix.textfield
+#:import MDSpinner kivymd.uix.spinner
+#:import MDCard kivymd.uix.card
+#:import MDSeparator kivymd.uix.card
+#:import MDDropdownMenu kivymd.uix.menu
 #:import get_color_from_hex kivy.utils.get_color_from_hex
 #:import colors kivymd.color_definitions.colors
-#:import SmartTile kivymd.grid.SmartTile
-#:import MDSlider kivymd.slider.MDSlider
-#:import MDTabbedPanel kivymd.tabs.MDTabbedPanel
-#:import MDTab kivymd.tabs.MDTab
-#:import MDProgressBar kivymd.progressbar.MDProgressBar
-#:import MDAccordion kivymd.accordion.MDAccordion
-#:import MDAccordionItem kivymd.accordion.MDAccordionItem
-#:import MDAccordionSubItem kivymd.accordion.MDAccordionSubItem
-#:import MDThemePicker kivymd.theme_picker.MDThemePicker
-#:import MDBottomNavigation kivymd.tabs.MDBottomNavigation
-#:import MDBottomNavigationItem kivymd.tabs.MDBottomNavigationItem
+#:import SmartTile kivymd.uix.gridlayout
+#:import MDSlider kivymd.uix.slider
+#:import MDTabbedPanel kivymd.uix.tab
+#:import MDTab kivymd.uix.tab
+#:import MDProgressBar kivymd.uix.progressbar
+#:import MDThemePicker kivymd.uix.picker
+#:import MDBottomNavigation kivymd.uix.tab
+#:import MDBottomNavigationItem kivymd.uix.tab
 
 
-NavigationLayout:
+MDNavigationLayout:
     id: nav_layout
-    MDNavigationDrawer:
-        id: nav_drawer
-        NavigationDrawerToolbar:
-            title: "Navigation Drawer"
-        NavigationDrawerIconButton:
-            icon: 'checkbox-blank-circle'
-            text: "Home"
-            on_release: app.root.ids.scr_mngr.current = 'accordion'
-        NavigationDrawerIconButton:
-            icon: 'checkbox-blank-circle'
-            text: "Profile"
-            on_release: app.root.ids.scr_mngr.current = 'bottom_navigation'
-        NavigationDrawerIconButton:
-            icon: 'checkbox-blank-circle'
-            text: "About"
-            on_release: app.root.ids.scr_mngr.current = 'bottom_navigation'
-        NavigationDrawerIconButton:
-            icon: 'checkbox-blank-circle'
-            text: "Contact"
-            on_release: app.root.ids.scr_mngr.current = 'bottom_navigation'
-        NavigationDrawerIconButton:
-            icon: 'checkbox-blank-circle'
-            text: "Logout"
-            on_release: app.user_logout()
-    BoxLayout:
-        orientation: 'vertical'
-        ScreenManager:
-            id: scr_mngr
-            Screen:
-                name: 'user_login'
-
-                Toolbar:
-                    title: "User Login"
-                    pos_hint: {'center_x': 0.5, 'center_y': 0.95}
-                    md_bg_color: app.theme_cls.primary_color
-                    background_palette: 'Primary'
-                    background_hue: '500'
-                BoxLayout:
-                    orientation: 'vertical'
-                    size_hint_x: None
-                    size_hint_y: None
-                    pos_hint: {'center_x': 0.5, 'center_y': 0.3}
-                    width: dp(500)
-                    BoxLayout:
-                        orientation: 'vertical'
-                        MDTextField:
-                            id: email
-                            hint_text: "Email"
-                            margin_bottom: dp(20)
-                            required: True
-                            helper_text_mode: "on_error"
-
-                        MDTextField:
-                            id: password
-                            hint_text: "Password"
-                            margin_bottom: dp(20)
-                            required: True
-                            helper_text_mode: "on_error"
-                            password: True
-
-                        MDRaisedButton:
-                            id: login
-                            text: "Sign in"
-                            elevation_normal: 2
-                            opposite_colors: True
+    ScreenManager:
+        MDScreen:
+            MDBoxLayout:
+                orientation: 'vertical'
+                ScreenManager:
+                    id: scr_mngr
+                    MDScreen:
+                        name: 'user_login'
+        
+                        MDToolbar:
+                            title: "User Login"
+                            pos_hint: {'center_x': 0.5, 'center_y': 0.95}
+                            md_bg_color: app.theme_cls.primary_color
+                            background_palette: 'Primary'
+                            background_hue: '500'
+                        MDBoxLayout:
+                            orientation: 'vertical'
+                            size_hint_x: None
+                            size_hint_y: None
+                            pos_hint: {'center_x': 0.5, 'center_y': 0.3}
+                            width: dp(500)
+                            MDBoxLayout:
+                                orientation: 'vertical'
+                                MDTextField:
+                                    id: email
+                                    hint_text: "Email"
+                                    margin_bottom: dp(20)
+                                    required: True
+                                    helper_text_mode: "on_error"
+        
+                                MDTextField:
+                                    id: password
+                                    hint_text: "Password"
+                                    margin_bottom: dp(20)
+                                    required: True
+                                    helper_text_mode: "on_error"
+                                    password: True
+        
+                                MDRaisedButton:
+                                    id: login
+                                    text: "Sign in"
+                                    elevation_normal: 2
+                                    opposite_colors: True
+                                    pos_hint: {'center_x': 0.5, 'center_y': 0.4}
+                                    on_release:  app.user_login()
+                                    on_press: app.progress_loader('login')
+                                MDSpinner:
+                                    id: spinner_login
+                                    size_hint: None, None
+                                    size: dp(50), dp(50)
+                                    pos_hint: {'center_x': 0.5, 'center_y': 0.7}
+                                    active: False
+                            MDBoxLayout:
+                                orientation: 'vertical'
+                                size_hint_y: None
+                                MDFlatButton:
+                                    id: forgot_password
+                                    text: 'Forgot Password'
+                                    pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                                    on_release:  app.root.ids.scr_mngr.current = 'forgot_password'
+        
+                                MDFlatButton:
+                                    id: register
+                                    text: 'Register'
+                                    pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                                    on_release:  app.root.ids.scr_mngr.current = 'register'
+        
+        
+                    MDScreen:
+                        name: 'forgot_password'
+                        MDToolbar:
+                            title: "Forgot Password"
+                            pos_hint: {'center_x': 0.5, 'center_y': 0.95}
+                            md_bg_color: app.theme_cls.primary_color
+                            background_palette: 'Primary'
+                            background_hue: '500'
+                            left_action_items: [['arrow-left', lambda x: app.back_to_login()]]
+        
+        
+                    MDScreen:
+                        name: 'user_home'
+                        MDToolbar:
+                            title: "Home"
+                            pos_hint: {'center_x': 0.5, 'center_y': 0.95}
+                            md_bg_color: app.theme_cls.primary_color
+                            background_palette: 'Primary'
+                            background_hue: '500'
+                            left_action_items: [['menu', lambda x: app.root.toggle_nav_drawer()]]
+        
+        
+        
+                    MDScreen:
+                        name: 'register'
+                        MDToolbar:
+                            title: "Register"
+                            pos_hint: {'center_x': 0.5, 'center_y': 0.95}
+                            md_bg_color: app.theme_cls.primary_color
+                            background_palette: 'Primary'
+                            background_hue: '500'
+                            left_action_items: [['arrow-left', lambda x: app.back_to_login()]]
+                        MDBoxLayout:
+                            orientation: 'vertical'
+                            size_hint_x: None
+                            size_hint_y: None
+                            pos_hint: {'center_x': 0.5, 'center_y': 0.3}
+                            width: dp(500)
+                            MDBoxLayout:
+                                orientation: 'vertical'
+                                MDTextField:
+                                    id: first_name
+                                    hint_text: "First Name(Optional)"
+                                    margin_bottom: dp(20)
+                                    required: True
+                                    helper_text_mode: "on_error"
+                                MDTextField:
+                                    id: last_name
+                                    hint_text: "Last Name(Optional)"
+                                    margin_bottom: dp(20)
+                                    required: True
+                                    helper_text_mode: "on_error"
+                                MDTextField:
+                                    id: email_signup
+                                    hint_text: "Email"
+                                    margin_bottom: dp(20)
+                                    required: True
+                                    helper_text_mode: "on_error"
+                                MDTextField:
+                                    id: password_signup
+                                    hint_text: "Password"
+                                    margin_bottom: dp(20)
+                                    required: True
+                                    helper_text_mode: "on_error"
+                                    password: True
+                                MDRaisedButton:
+                                    id: signup
+                                    text: "Sign up"
+                                    elevation_normal: 2
+                                    opposite_colors: True
+                                    pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                                    on_release:  app.user_register()
+                                    on_press: app.progress_loader('register')
+                                MDSpinner:
+                                    id: spinner_register
+                                    size_hint: None, None
+                                    size: dp(50), dp(50)
+                                    pos_hint: {'center_x': 0.5, 'center_y': 0.7}
+                                    active: False
+        
+                    MDScreen:
+                        name: 'verify_email'
+                        BoxLayout:
+                            orientation: 'vertical'
+                            size_hint_x: None
+                            size_hint_y: None
                             pos_hint: {'center_x': 0.5, 'center_y': 0.4}
-                            on_release:  app.user_login()
-                            on_press: app.progress_loader('login')
-                        MDSpinner:
-                            id: spinner_login
-                            size_hint: None, None
-                            size: dp(50), dp(50)
-                            pos_hint: {'center_x': 0.5, 'center_y': 0.7}
-                            active: False
-                    BoxLayout:
-                        orientation: 'vertical'
-                        size_hint_y: None
-                        MDFlatButton:
-                            id: forgot_password
-                            text: 'Forgot Password'
-                            pos_hint: {'center_x': 0.5, 'center_y': 0.5}
-                            on_release:  app.root.ids.scr_mngr.current = 'forgot_password'
-
-                        MDFlatButton:
-                            id: register
-                            text: 'Register'
-                            pos_hint: {'center_x': 0.5, 'center_y': 0.5}
-                            on_release:  app.root.ids.scr_mngr.current = 'register'
-
-
-            Screen:
-                name: 'forgot_password'
-                Toolbar:
-                    title: "Forgot Password"
-                    pos_hint: {'center_x': 0.5, 'center_y': 0.95}
-                    md_bg_color: app.theme_cls.primary_color
-                    background_palette: 'Primary'
-                    background_hue: '500'
-                    left_action_items: [['arrow-left', lambda x: app.back_to_login()]]
-
-
-            Screen:
-                name: 'user_home'
-                Toolbar:
-                    title: "Home"
-                    pos_hint: {'center_x': 0.5, 'center_y': 0.95}
-                    md_bg_color: app.theme_cls.primary_color
-                    background_palette: 'Primary'
-                    background_hue: '500'
-                    left_action_items: [['menu', lambda x: app.root.toggle_nav_drawer()]]
-
-
-
-            Screen:
-                name: 'register'
-                Toolbar:
-                    title: "Register"
-                    pos_hint: {'center_x': 0.5, 'center_y': 0.95}
-                    md_bg_color: app.theme_cls.primary_color
-                    background_palette: 'Primary'
-                    background_hue: '500'
-                    left_action_items: [['arrow-left', lambda x: app.back_to_login()]]
-                BoxLayout:
-                    orientation: 'vertical'
-                    size_hint_x: None
-                    size_hint_y: None
-                    pos_hint: {'center_x': 0.5, 'center_y': 0.3}
-                    width: dp(500)
-                    BoxLayout:
-                        orientation: 'vertical'
-                        MDTextField:
-                            id: first_name
-                            hint_text: "First Name(Optional)"
-                            margin_bottom: dp(20)
-                            required: True
-                            helper_text_mode: "on_error"
-                        MDTextField:
-                            id: last_name
-                            hint_text: "Last Name(Optional)"
-                            margin_bottom: dp(20)
-                            required: True
-                            helper_text_mode: "on_error"
-                        MDTextField:
-                            id: email_signup
-                            hint_text: "Email"
-                            margin_bottom: dp(20)
-                            required: True
-                            helper_text_mode: "on_error"
-                        MDTextField:
-                            id: password_signup
-                            hint_text: "Password"
-                            margin_bottom: dp(20)
-                            required: True
-                            helper_text_mode: "on_error"
-                            password: True
-                        MDRaisedButton:
-                            id: signup
-                            text: "Sign up"
-                            elevation_normal: 2
-                            opposite_colors: True
-                            pos_hint: {'center_x': 0.5, 'center_y': 0.5}
-                            on_release:  app.user_register()
-                            on_press: app.progress_loader('register')
-                        MDSpinner:
-                            id: spinner_register
-                            size_hint: None, None
-                            size: dp(50), dp(50)
-                            pos_hint: {'center_x': 0.5, 'center_y': 0.7}
-                            active: False
-
-            Screen:
-                name: 'verify_email'
-                BoxLayout:
-                    orientation: 'vertical'
-                    size_hint_x: None
-                    size_hint_y: None
-                    pos_hint: {'center_x': 0.5, 'center_y': 0.4}
-                    width: dp(500)
-                    BoxLayout:
-                        orientation: 'vertical'
-                        MDTextField:
-                            id: email_verify
-                            hint_text: "Paste Verification Code"
-                            margin_bottom: dp(20)
-                            required: True
-                            helper_text_mode: "on_error"
-                        MDRaisedButton:
-                            id: verify
-                            text: "Verify"
-                            elevation_normal: 2
-                            opposite_colors: True
-                            pos_hint: {'center_x': 0.5, 'center_y': 0.5}
-                            on_release:  app.user_verify_email()
-                            on_press: app.progress_loader('verify')
-                        MDSpinner:
-                            id: spinner_verify
-                            size_hint: None, None
-                            size: dp(50), dp(50)
-                            pos_hint: {'center_x': 0.5, 'center_y': 0.7}
-                            active: False
-
+                            width: dp(500)
+                            BoxLayout:
+                                orientation: 'vertical'
+                                MDTextField:
+                                    id: email_verify
+                                    hint_text: "Paste Verification Code"
+                                    margin_bottom: dp(20)
+                                    required: True
+                                    helper_text_mode: "on_error"
+                                MDRaisedButton:
+                                    id: verify
+                                    text: "Verify"
+                                    elevation_normal: 2
+                                    opposite_colors: True
+                                    pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                                    on_release:  app.user_verify_email()
+                                    on_press: app.progress_loader('verify')
+                                MDSpinner:
+                                    id: spinner_verify
+                                    size_hint: None, None
+                                    size: dp(50), dp(50)
+                                    pos_hint: {'center_x': 0.5, 'center_y': 0.7}
+                                    active: False
+    MDNavigationDrawer:
+        MDToolbar:
+            title: "Navigation Drawer"
 
 '''
 HOST_URL = 'http://userauth.pythonanywhere.com/'
@@ -277,14 +258,12 @@ class HackedDemoNavDrawer(MDNavigationDrawer):
                 self.active_item = widget
             # widget.bind(on_release=lambda x: self.panel.toggle_state())
             widget.bind(on_release=lambda x: x._set_active(True, list=self))
-        elif issubclass(widget.__class__, NavigationDrawerHeaderBase):
-            self._header_container.add_widget(widget)
         else:
             super(MDNavigationDrawer, self).add_widget(widget, index)
 
 
-class UserAuthApp(App):
-    theme_cls = ThemeManager()
+class UserAuthApp(MDApp):
+
     previous_date = ObjectProperty()
     title = "User Authentication App"
     menu_items = [
