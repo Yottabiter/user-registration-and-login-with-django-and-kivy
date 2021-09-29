@@ -10,7 +10,7 @@ from kivy.properties import ObjectProperty
 from kivy.uix.image import Image
 
 from kivymd.uix.bottomsheet import MDListBottomSheet, MDGridBottomSheet
-from kivymd.uix.button import MDIconButton
+from kivymd.uix.button import MDIconButton, MDFlatButton
 from kivymd.uix.picker import MDDatePicker
 from kivymd.uix.dialog import MDDialog
 from kivymd.uix.label import MDLabel
@@ -245,7 +245,8 @@ MDNavigationLayout:
             title: "Navigation Drawer"
 
 '''
-HOST_URL = 'http://userauth.pythonanywhere.com/'
+#HOST_URL = 'http://userauth.pythonanywhere.com/'
+HOST_URL = 'http://127.0.0.1:8000/'
 
 
 class HackedDemoNavDrawer(MDNavigationDrawer):
@@ -287,7 +288,7 @@ class UserAuthApp(MDApp):
         main_widget = Builder.load_string(main_widget_kv)
         if os.stat("token.json").st_size != 0:
             with open('token.json') as f:
-                data = json.load(f)
+                data = json.loads(f.read())
                 result = data['token']
                 token = 'Token ' + result
                 headers = {'Content-type': 'application/json',
@@ -325,7 +326,8 @@ class UserAuthApp(MDApp):
             params = json.dumps({'email': email, 'password': password})
             headers = {'Content-type': 'application/json',
                        'Accept': 'application/json'}
-            req = UrlRequest(HOST_URL+'api/accounts/login/', method='POST', on_success=self.user_home_welcome, on_failure=self.user_login_error, req_body=params,
+            req = UrlRequest(HOST_URL+'api/accounts/login/', method='POST', on_success=self.user_home_welcome,
+                             on_failure=self.user_login_error, req_body=params,
                              req_headers=headers)
 
     def user_register(self, *args):
@@ -347,12 +349,13 @@ class UserAuthApp(MDApp):
         if code != '':
             headers = {'Content-type': 'application/json',
                        'Accept': 'application/json'}
-            req = UrlRequest(HOST_URL+'api/accounts/signup/verify/?code='+code, method='GET', on_success=self.user_home_welcome,
+            req = UrlRequest(HOST_URL+'api/accounts/signup/verify/?code='+code, method='GET',
+                             on_success=self.user_home_welcome,
                              on_failure=self.user_verify_error,
                              req_headers=headers)
 
     def user_home_welcome(self, result, req):
-        result = req['token']
+        result = req
         if os.stat("token.json").st_size == 0:
             with open('token.json', 'w') as outfile:
                 json.dump(result, outfile)
@@ -369,14 +372,14 @@ class UserAuthApp(MDApp):
                           size_hint_y=None,
                           valign='top')
         content.bind(texture_size=content.setter('size'))
-        self.dialog = MDDialog(title="Please check email and password",
-                               content=content,
-                               size_hint=(.8, None),
-                               height=dp(200),
-                               auto_dismiss=False)
-
-        self.dialog.add_action_button("Try Again",
-                                      action=lambda *x: self.dialog.dismiss())
+        self.dialog = MDDialog(
+            title="Please check email and password",
+            buttons=[
+                MDFlatButton(
+                        text="CANCEL", text_color=self.theme_cls.primary_color
+                ),
+            ],
+        )
         self.dialog.open()
 
     def user_register_error(self, req, result):
@@ -388,13 +391,12 @@ class UserAuthApp(MDApp):
                           valign='top')
         content.bind(texture_size=content.setter('size'))
         self.dialog = MDDialog(title="Registration Failed",
-                               content=content,
-                               size_hint=(.8, None),
-                               height=dp(200),
-                               auto_dismiss=False)
-
-        self.dialog.add_action_button("Try Again",
-                                      action=lambda *x: self.dialog.dismiss())
+                               buttons=[
+                                   MDFlatButton(
+                                       text="CANCEL", text_color=self.theme_cls.primary_color
+                                   ),
+                               ],
+        )
         self.dialog.open()
 
     def user_verify_error(self, req, result):

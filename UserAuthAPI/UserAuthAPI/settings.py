@@ -134,13 +134,15 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 # Email settings
-DEFAULT_EMAIL_FROM = 'markemma2012@gmail.com'
-DEFAULT_EMAIL_BCC = ''
+EMAIL_FROM = 'a.fatir@hotmail.com'
+EMAIL_BCC = ''
 
-EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST = 'smtp-mail.outlook.com'
 EMAIL_PORT = 587
-EMAIL_HOST_USER = 'markemma2012@gmail.com'
-EMAIL_HOST_PASSWORD = '!5ng1n5e$m'
+EMAIL_HOST_USER = 'a.fatir@hotmail.com'
+EMAIL_HOST_PASSWORD = '0nlyeverNimra'
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
-SERVER_EMAIL = 'markemma2012@gmail.com'
+SERVER_EMAIL = 'a.fatir@hotmail.com'
+
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
