@@ -11,4 +11,7 @@ Using Django Backend(Django RestFUL APIs)
 ![alt text](screenshots/register.png "Register Page")
 
 
+###  superuser credentials
+Email:_admin@web.com_
 
+Password:_admin_
